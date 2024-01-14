@@ -1,3 +1,5 @@
+const host = "api.frankfurter.app";
+
 const accountInitialState = {
   balance: 0,
   loan: 0,
@@ -35,8 +37,20 @@ export default function accountReducer(state = accountInitialState, action) {
   }
 }
 
-export function deposit(amount) {
-  return { type: "account/deposit", payload: amount };
+export function deposit(amount, currency) {
+  if (currency === "INR") return { type: "account/deposit", payload: amount };
+
+  return async function (dispatch, getState) {
+    //api call
+    //return action
+    const res = await fetch(
+      `https://${host}/latest?amount=${amount}&from=${currency}&to=INR`
+    );
+    const data = await res.json();
+    const ans = data.rates.INR;
+
+    dispatch({ type: "account/deposit", payload: ans });
+  };
 }
 export function withdraw(amount) {
   return { type: "account/withdraw", payload: amount };
