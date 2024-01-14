@@ -4,6 +4,7 @@ const accountInitialState = {
   balance: 0,
   loan: 0,
   loanPurpose: "",
+  isLoading: false,
 };
 export default function accountReducer(state = accountInitialState, action) {
   switch (action.type) {
@@ -11,6 +12,7 @@ export default function accountReducer(state = accountInitialState, action) {
       return {
         ...state,
         balance: action.payload + state.balance,
+        isLoading: false,
       };
     case "account/withdraw":
       return {
@@ -32,6 +34,11 @@ export default function accountReducer(state = accountInitialState, action) {
         loanPurpose: "",
         balance: state.balance - state.loan,
       };
+    case "account/currencyConverting":
+      return {
+        ...state,
+        isLoading: true,
+      };
     default:
       return state;
   }
@@ -43,6 +50,7 @@ export function deposit(amount, currency) {
   return async function (dispatch, getState) {
     //api call
     //return action
+    dispatch({ type: "account/currencyConverting" });
     const res = await fetch(
       `https://${host}/latest?amount=${amount}&from=${currency}&to=INR`
     );
